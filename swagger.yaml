@@ -1,0 +1,182 @@
+openapi: 3.0.0
+info:
+  title: Automart Documentation
+  version: 1.0.0
+tags:
+  - name: User
+    description: Auto-Mart User Authentication System
+
+servers:
+  - url: http://localhost:3000/api/v1
+paths:
+  /user/signup:
+    post:
+      summary: Signs up a new user
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Signup"
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                payload: # <--- form field that contains the JSON message
+                  $ref: "#/components/schemas/Signup"
+            encoding:
+              payload:
+                contentType: application/json
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Created"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /user/login:
+    post:
+      summary: Log in a user
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                payload: # <--- form field that contains the JSON message
+                  $ref: "#/components/schemas/Login"
+            encoding:
+              payload:
+                contentType: application/json
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthenticated:
+      description: Can not authenticate user
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: Resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Signup:
+      title: A Signup body
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: John
+          description: Signup first_name
+        last_name:
+          type: string
+          example: Doe
+          description: Signup last_name
+        email:
+          type: string
+          example: johndoe@gmail.com
+          description: Signup email
+        password:
+          type: string
+          example: Password@123
+          description: Signup password
+        address:
+          type: string
+          example: Password@123
+          description: Signup password
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+        - address
+      # Schema for error response body
+    Login:
+      title: A Login body
+      type: object
+      properties:
+        email:
+          type: string
+          example: johndoe@gmail.com
+          description: Signin email
+        password:
+          type: string
+          example: Password@123
+          description: Signin password
+      required:
+        - email
+        - password
+    Ok:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        data:
+          type: string
+          example: []
+    Created:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 201
+        data:
+          type: array
+          example: []
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        error:
+          type: string
+      required:
+        - code
+        - Error
